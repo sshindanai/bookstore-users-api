@@ -7,9 +7,10 @@ import (
 func mapURLs() {
 	// Users endpoints
 	router.GET("/users", userscontroller.GetUsers)
-	router.GET("/users/:user_id", userscontroller.GetUser)
-	//router.GET("/users/search", userscontroller.FindUser)
-	router.POST("/users", userscontroller.CreateUser)
-	router.PUT("/users/:user_id", userscontroller.UpdateUser)
-	router.DELETE("/users/:user_id", userscontroller.DeleteUser)
+	router.GET("/users/:id", userscontroller.Get)
+	router.GET("/internal/users/search", userscontroller.Search)
+	router.POST("/users", userscontroller.Create)
+	router.PUT("/users/:id", userscontroller.Update)
+	router.PATCH("/users/:id", userscontroller.Update)
+	router.DELETE("/users/:id", userscontroller.Delete)
 }

@@ -39,3 +39,11 @@ func NewInternalServerError(message string) *RestErr {
 		Error:   "internal_server_error",
 	}
 }
+
+func NewConflictError(message string) *RestErr {
+	return &RestErr{
+		Message: message,
+		Code:    http.StatusConflict,
+		Error:   "conflict",
+	}
+}

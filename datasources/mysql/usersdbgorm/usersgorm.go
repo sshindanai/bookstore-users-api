@@ -1,11 +1,11 @@
-package usersdb
+package usersdbgorm
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const (
@@ -16,8 +16,7 @@ const (
 )
 
 var (
-	Client *sql.DB
-
+	GormDB   *gorm.DB
 	username = os.Getenv(mysql_username)
 	password = os.Getenv(mysql_password)
 	host     = os.Getenv(mysql_host)
@@ -30,11 +29,9 @@ func init() {
 		username, password, host, schema,
 	)
 	var err error
-	Client, err = sql.Open("mysql", datasourceName)
+	GormDB, err = gorm.Open(mysql.Open(datasourceName), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	if err := Client.Ping(); err != nil {
-		panic(err)
-	}
+	//GormDB.AutoMigrate(&usersdomain.User)
 }
