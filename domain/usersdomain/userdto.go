@@ -21,7 +21,7 @@ type User struct {
 	DateCreated string `json:"date_created" gorm:"column:date_created"`
 	DateUpdated string `json:"date_updated" gorm:"column:date_updated"`
 	Status      string `json:"status" gorm:"default:active"`
-	Password    string `json:"-"`
+	Password    string `json:"password"`
 }
 
 type GetUsersDto struct {
