@@ -15,6 +15,7 @@ const (
 	queryUpdateUser       = "UPDATE users SET first_name=?, last_name=?, email=?, date_updated=? WHERE ID=?;"
 	queryDeleteUser       = "DELETE FROM users WHERE ID=?;"
 	queryFindUserByStatus = "SELECT * FROM users WHERE status=?;"
+	statusActive          = "active"
 )
 
 func (user *User) Save() *errors.RestErr {
@@ -91,8 +92,9 @@ func (user *User) GetUser() *errors.RestErr {
 
 func (user *User) GormGetUser() *errors.RestErr {
 	result := usersdbgorm.GormDB.First(&user)
+
 	if result.Error != nil {
-		return errors.NewInternalServerError(result.Error.Error())
+		return mysqlutils.ParseError(result.Error, user.ID)
 	}
 	return nil
 }
@@ -182,4 +184,12 @@ func (user *User) FindByStatus(status string) ([]User, *errors.RestErr) {
 	}
 
 	return results, nil
+}
+
+func (user *User) FindByEmailAndPassword() *errors.RestErr {
+	result := usersdbgorm.GormDB.Where("email = ? AND password = ? AND status = ?", user.Email, user.Password, statusActive).First(&user)
+	if result.Error != nil {
+		return errors.NewUnauthorizedError("invalid email or password")
+	}
+	return nil
 }

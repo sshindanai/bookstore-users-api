@@ -7,23 +7,21 @@ import (
 	"github.com/sshindanai/repo/bookstore-users-api/utils/errors"
 )
 
+// Make userService struct staisfy the userServiceInterface interface that name UserService
+var (
+	UserService userServiceInterface = &userService{}
+)
+
 type userService struct{}
 
-type userInterface interface {
+type userServiceInterface interface {
 	Create(*usersdomain.CreateUserRequest) (*usersdomain.User, *errors.RestErr)
 	Get(int64) (*usersdomain.User, *errors.RestErr)
 	GetUsers() (*usersdomain.GetUsersDto, *errors.RestErr)
 	Update(bool, int64, *usersdomain.CreateUserRequest) (*usersdomain.User, *errors.RestErr)
 	Delete(int64) *errors.RestErr
 	Search(string) ([]usersdomain.User, *errors.RestErr)
-}
-
-var (
-	UserService userInterface
-)
-
-func init() {
-	UserService = &userService{}
+	LoginUser(*usersdomain.LoginUserRequest) (*usersdomain.User, *errors.RestErr)
 }
 
 func (s *userService) Create(user *usersdomain.CreateUserRequest) (*usersdomain.User, *errors.RestErr) {
@@ -32,7 +30,7 @@ func (s *userService) Create(user *usersdomain.CreateUserRequest) (*usersdomain.
 		return nil, err
 	}
 	// Hashing password
-	user.Password = cryptoutils.GetMd5(user.Password)
+	user.Password = cryptoutils.GetSHA256(user.Password)
 
 	result, err := user.GormCreateUser()
 	if err != nil {
@@ -115,4 +113,28 @@ func (s *userService) Search(status string) ([]usersdomain.User, *errors.RestErr
 		return nil, err
 	}
 	return users, nil
+}
+
+func (s *userService) LoginUser(request *usersdomain.LoginUserRequest) (*usersdomain.User, *errors.RestErr) {
+	err := request.Validate()
+	if err != nil {
+		return nil, err
+	}
+
+	user := &usersdomain.User{
+		Email:    request.Email,
+		Password: cryptoutils.GetSHA256(request.Password),
+	}
+	if err := user.FindByEmailAndPassword(); err != nil {
+		return nil, err
+	}
+
+	// Authenticate
+	// result, err := oauth.NewRestOauth().Authenticate(user)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println(result)
+
+	return user, nil
 }

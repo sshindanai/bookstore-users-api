@@ -66,7 +66,6 @@ func GetUsers(c *gin.Context) {
 
 func FindUser(c *gin.Context) {
 	c.String(http.StatusNotImplemented, "Not implement FindUser!")
-
 }
 
 func Update(c *gin.Context) {
@@ -121,4 +120,19 @@ func Search(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, users)
+}
+
+func Login(c *gin.Context) {
+	var request usersdomain.LoginUserRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		restErr := errors.NewBadRequestError("invalid json body")
+		c.JSON(restErr.Code, restErr)
+		return
+	}
+	user, err := usersservices.UserService.LoginUser(&request)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }
