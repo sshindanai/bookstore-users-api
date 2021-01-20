@@ -37,6 +37,11 @@ func Create(c *gin.Context) {
 }
 
 func Get(c *gin.Context) {
+	// if err := oauth.AuthenticateRequest(c.Request); err != nil {
+	// 	c.JSON(err.Code, err)
+	// 	return
+	// }
+
 	userId, err := getUserId(c.Param("id"))
 	if err != nil {
 		c.JSON(err.Code, err)
